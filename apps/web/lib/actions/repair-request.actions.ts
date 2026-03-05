@@ -98,7 +98,7 @@ export async function updateStatusAction(id: string, newStatus: RepairStatus) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Not authenticated" };
   try {
-    await updateRequestStatus(id, newStatus, session.user.id);
+    await updateRequestStatus(id, newStatus);
     revalidatePath("/volunteer/requests");
     revalidatePath(`/volunteer/requests/${id}`);
     return { success: true };

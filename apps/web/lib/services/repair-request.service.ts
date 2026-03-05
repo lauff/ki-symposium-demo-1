@@ -88,7 +88,7 @@ export async function scheduleRequest(id: string, eventId: string) {
   });
 }
 
-export async function updateRequestStatus(id: string, newStatus: RepairStatus, _volunteerId?: string) {
+export async function updateRequestStatus(id: string, newStatus: RepairStatus) {
   const req = await db.repairRequest.findUnique({ where: { id } });
   if (!req) throw new Error("Request not found");
 
