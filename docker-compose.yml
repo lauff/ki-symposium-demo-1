@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: repair
+      POSTGRES_PASSWORD: repair
+      POSTGRES_DB: repair_cafe
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://repair:repair@db:5432/repair_cafe
+      NEXTAUTH_URL: http://localhost:3000
+      # Change NEXTAUTH_SECRET in production to a cryptographically secure random string
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-development-secret-change-in-production}
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

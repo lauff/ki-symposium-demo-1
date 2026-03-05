@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CITIZEN
+  VOLUNTEER
+}
+
+enum RepairCategory {
+  ELECTRONICS
+  SMALL_APPLIANCE
+  TEXTILE
+  BIKE
+  WOOD
+  OTHER
+}
+
+enum RepairStatus {
+  SUBMITTED
+  REVIEWED
+  SCHEDULED
+  IN_REPAIR
+  REPAIRED
+  NOT_REPAIRABLE
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      Role     @default(CITIZEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  repairRequests  RepairRequest[] @relation("CreatedBy")
+  claimedRequests RepairRequest[] @relation("ClaimedBy")
+  ownedEvents     RepairEvent[]
+}
+
+model RepairRequest {
+  id          String         @id @default(uuid())
+  title       String
+  category    RepairCategory
+  description String
+  photos      String[]
+  status      RepairStatus   @default(SUBMITTED)
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  createdBy       User   @relation("CreatedBy", fields: [createdByUserId], references: [id])
+  createdByUserId String
+
+  claimedBy            User?   @relation("ClaimedBy", fields: [claimedByVolunteerId], references: [id])
+  claimedByVolunteerId String?
+
+  scheduledEvent   RepairEvent? @relation(fields: [scheduledEventId], references: [id])
+  scheduledEventId String?
+}
+
+model RepairEvent {
+  id        String   @id @default(uuid())
+  title     String
+  location  String
+  startAt   DateTime
+  endAt     DateTime
+  capacity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  volunteerOwner   User   @relation(fields: [volunteerOwnerId], references: [id])
+  volunteerOwnerId String
+
+  scheduledRequests RepairRequest[]
+}
