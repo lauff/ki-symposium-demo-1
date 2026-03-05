@@ -22,8 +22,11 @@ jobs:
       - name: Install dependencies
         run: cd apps/web && npm ci
 
-      - name: Run domain tests
-        run: cd apps/web && npm test -- --run
+      - name: Lint
+        run: cd apps/web && npm run lint
 
       - name: Type check
         run: cd apps/web && npx tsc --noEmit
+
+      - name: Run tests
+        run: cd apps/web && npm test -- --run
